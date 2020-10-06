@@ -67,9 +67,9 @@ func isMatch(s string, p string) bool {
 			if p[j-1] == '*' {
 				// *后面是match的，
 				if matches(i-1, j-2) {
-					dp[i][j] = dp[i][j - 2] || dp[i - 1][j - 2] || dp[i - 1][j]
-				}else {
-					dp[i][j] = dp[i][j - 2]
+					dp[i][j] = dp[i][j-2] || dp[i-1][j-2] || dp[i-1][j]
+				} else {
+					dp[i][j] = dp[i][j-2]
 				}
 			} else if matches(i, j) {
 				dp[i][j] = dp[i-1][j-1]
