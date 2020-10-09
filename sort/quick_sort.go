@@ -1,7 +1,5 @@
 package sort
 
-import "fmt"
-
 func quickSort(arr []int) []int {
 	if len(arr) == 1 {
 		return arr
@@ -12,7 +10,6 @@ func quickSort(arr []int) []int {
 		}
 		return arr
 	}
-	fmt.Println(arr)
 	left, right := 0, len(arr)-1
 	pivotIndex := len(arr) / 2
 	pivot := arr[pivotIndex]
@@ -27,8 +24,6 @@ func quickSort(arr []int) []int {
 		}
 		arr[left], arr[right] = arr[right], arr[left]
 	}
-	fmt.Println(arr[:left])
-	fmt.Println(arr[left:])
 	quickSort(arr[:left])
 	quickSort(arr[left:])
 	return arr
