@@ -1,19 +1,44 @@
 package algorithm
 
+import (
+	"context"
+)
+
+var TestKey = "f1vn2x1B"
+
 type Algorithm struct {
+	//数据流
 	permutationsChan chan string
 	used             map[int]bool
+	count            int64
+	QPS              int64
+	Ctx              context.Context
+}
+
+func (a *Algorithm) Init() {
+	a.permutationsChan = make(chan string, a.QPS)
+	a.used = make(map[int]bool)
 }
 
 func (a *Algorithm) Permutation(s string) {
-	a.permutationsChan = make(chan string, 100)
 	a.permutationString(s, "")
+	close(a.permutationsChan)
 }
 
 //回溯算法
 func (a *Algorithm) permutationString(s string, ret string) {
+	select {
+	case <-a.Ctx.Done():
+		return
+	default:
+
+	}
 	if len(ret) == len(s) {
 		a.permutationsChan <- ret
+		a.count++
+		if a.count > 0 && a.count%a.QPS == 0 {
+			//time.Sleep(time.Second)
+		}
 		return
 	}
 	m := make(map[uint8]bool)

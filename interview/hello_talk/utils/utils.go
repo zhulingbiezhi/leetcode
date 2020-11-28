@@ -4,7 +4,7 @@ import (
 	"runtime/debug"
 	"strings"
 
-	"github.com/zhulingbiezhi/leetcode/interview/hello_talk/logger"
+	"hellotalk/logger"
 )
 
 func HandlePanicGo(f func()) {

@@ -5,9 +5,9 @@ import (
 	"io/ioutil"
 	"net/http"
 
-	"github.com/zhulingbiezhi/leetcode/interview/hello_talk/interview"
-	"github.com/zhulingbiezhi/leetcode/interview/hello_talk/logger"
-	"github.com/zhulingbiezhi/leetcode/interview/hello_talk/utils"
+	"hellotalk/interview"
+	"hellotalk/logger"
+	"hellotalk/utils"
 )
 
 type GetKeyResponse struct {
@@ -18,6 +18,15 @@ type GetKeyResponse struct {
 
 func HandleGetKey(w http.ResponseWriter, r *http.Request) {
 	logger.Info("[HandleGetKey] start get key")
+
+	//todo remove test code
+	go utils.HandlePanicGo(func() {
+		interview.DistributedTasks("B1vn2x1f", "")
+	})
+	logger.Info("[HandleGetKey] get key success, response ")
+	ResponseSuccess(w, "success")
+	return
+
 	urlStr := "http://interview.hellotalk8.com"
 	resp, err := http.DefaultClient.Get(urlStr)
 	if err != nil {
@@ -39,36 +48,48 @@ func HandleGetKey(w http.ResponseWriter, r *http.Request) {
 		ResponseServerError(w, "unmarshal body err")
 		return
 	}
+
 	go utils.HandlePanicGo(func() {
-		interview.DistributedTasks()
+		interview.DistributedTasks(ret.Key, ret.Token)
 	})
 	logger.Info("[HandleGetKey] get key success, response ", string(b))
 	ResponseSuccess(w, "success")
 }
 
 type TryKeysRequest struct {
+	Keys  string `json:"keys,omitempty"`
+	Token string `json:"token,omitempty"`
+}
+
+type TryKeysResponse struct {
+	Result string `json:"result,omitempty"`
 }
 
 func HandleTryKeys(w http.ResponseWriter, r *http.Request) {
-	logger.Info("[HandleGetKey] start try key")
+	//logger.Info("[HandleGetKey] start try key")
 	b, err := ioutil.ReadAll(r.Body)
 	if err != nil {
 		logger.Error("[HandleGetKey] read body err", err)
 		ResponseServerError(w, "read body err")
 		return
 	}
-	logger.Info("[HandleGetKey] request body", string(b))
+	//logger.Info("[HandleGetKey] request body", string(b))
 	defer r.Body.Close()
-	ret := &TryKeysRequest{}
-	err = json.Unmarshal(b, ret)
+	req := &TryKeysRequest{}
+	err = json.Unmarshal(b, req)
 	if err != nil {
 		logger.Error("[HandleGetKey] unmarshal request body err", err)
 		ResponseClientError(w, "unmarshal request body err")
 		return
 	}
-	go utils.HandlePanicGo(func() {
 
-	})
+	ret, err := interview.DealWithTask(req.Keys, req.Token)
+	if err != nil {
+		logger.Error("[HandleGetKey] DealWithTask err", err)
+		ResponseClientError(w, "DealWithTask err")
+		return
+	}
+	ResponseSuccessJson(w, TryKeysResponse{Result: ret})
 }
 
 func ResponseServerError(w http.ResponseWriter, msg string) {
@@ -90,6 +111,20 @@ func ResponseClientError(w http.ResponseWriter, msg string) {
 func ResponseSuccess(w http.ResponseWriter, msg string) {
 	w.WriteHeader(http.StatusOK)
 	_, err := w.Write([]byte(msg))
+	if err != nil {
+		logger.Error("response write err ", err)
+	}
+}
+
+func ResponseSuccessJson(w http.ResponseWriter, v interface{}) {
+	b, err := json.Marshal(v)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("json marshal err" + err.Error()))
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	_, err = w.Write(b)
 	if err != nil {
 		logger.Error("response write err ", err)
 	}

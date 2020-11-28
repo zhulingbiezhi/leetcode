@@ -2,15 +2,21 @@ package main
 
 import (
 	"net/http"
+	"os"
 
-	"github.com/zhulingbiezhi/leetcode/interview/hello_talk/apis"
+	"hellotalk/apis"
 )
 
 func main() {
 	http.HandleFunc("/interview/keys", apis.HandleGetKey)
 	http.HandleFunc("/interview/try_keys", apis.HandleTryKeys)
-	err := http.ListenAndServe(":8080", nil)
+	port, ok := os.LookupEnv("hello_port")
+	if !ok {
+		port = "8080"
+	}
+	err := http.ListenAndServe(":"+port, nil)
 	if err != nil {
 		panic(err)
 	}
+
 }
