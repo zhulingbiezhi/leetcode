@@ -2,6 +2,7 @@ package algorithm
 
 import (
 	"context"
+	"time"
 )
 
 var TestKey = "f1vn2x1B"
@@ -37,7 +38,7 @@ func (a *Algorithm) permutationString(s string, ret string) {
 		a.permutationsChan <- ret
 		a.count++
 		if a.count > 0 && a.count%a.QPS == 0 {
-			//time.Sleep(time.Second)
+			time.Sleep(time.Second)
 		}
 		return
 	}
