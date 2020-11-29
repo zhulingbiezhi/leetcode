@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"hellotalk/apis"
+	_ "net/http/pprof"
 )
 
 func main() {

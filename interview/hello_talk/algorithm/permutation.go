@@ -2,6 +2,7 @@ package algorithm
 
 import (
 	"context"
+	"hellotalk/logger"
 	"time"
 )
 
@@ -22,8 +23,10 @@ func (a *Algorithm) Init() {
 }
 
 func (a *Algorithm) Permutation(s string) {
+	logger.Info("Permutation key")
 	a.permutationString(s, "")
 	close(a.permutationsChan)
+	logger.Info("Permutation finish")
 }
 
 //回溯算法
