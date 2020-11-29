@@ -3,7 +3,6 @@ package algorithm
 import (
 	"context"
 	"hellotalk/logger"
-	"time"
 )
 
 var TestKey = "f1vn2x1B"
@@ -12,13 +11,11 @@ type Algorithm struct {
 	//数据流
 	permutationsChan chan string
 	used             map[int]bool
-	count            int64
-	QPS              int64
 	Ctx              context.Context
 }
 
 func (a *Algorithm) Init() {
-	a.permutationsChan = make(chan string, a.QPS)
+	a.permutationsChan = make(chan string)
 	a.used = make(map[int]bool)
 }
 
@@ -39,10 +36,6 @@ func (a *Algorithm) permutationString(s string, ret string) {
 	}
 	if len(ret) == len(s) {
 		a.permutationsChan <- ret
-		a.count++
-		if a.count > 0 && a.count%a.QPS == 0 {
-			time.Sleep(time.Second)
-		}
 		return
 	}
 	m := make(map[uint8]bool)

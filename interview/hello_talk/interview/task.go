@@ -37,7 +37,6 @@ func DistributedTasks(key string, token string) {
 	produceQPS := ServerQPS * srvLen
 
 	a := &algorithm.Algorithm{
-		QPS: int64(produceQPS),
 		Ctx: ctx,
 	}
 	a.Init()

@@ -7,6 +7,7 @@ import (
 	"hellotalk/logger"
 	"io/ioutil"
 	"strings"
+	"time"
 )
 
 type Server struct {
@@ -40,22 +41,22 @@ func (s *Server) Start(ctx context.Context, i int, token string) {
 	}()
 	for {
 		keys := make([]string, 0)
-	loop:
 		for {
 			select {
 			case key := <-s.dataChan:
 				keys = append(keys, key)
-				if len(keys) >= cap(s.dataChan)/2 {
-					break loop
-				}
 			case <-ctx.Done():
 				return
+			}
+			if len(keys) >= cap(s.dataChan){
+				break
 			}
 		}
 		if ret, ok := s.DealWithKeys(keys, token); ok {
 			logger.Infof("服务器 %d:  address: %s, find result: %s", i, s.httpAddress, ret)
 			s.resultChan <- ret
 		}
+		time.Sleep(time.Second)
 	}
 }
 
