@@ -72,7 +72,7 @@ func DistributedTasks(key string, token string) {
 				if (keyCount-moveCount)%produceQPS == 0 {
 					st := time.Since(t1) / time.Millisecond
 					if st > 5 {
-						logger.Infof("key数量: %d, 阻塞key转移数量：%d, 耗时: %d ms", keyCount-moveCount, moveCount)
+						logger.Infof("key数量: %d, 阻塞key转移数量：%d, 耗时: %d ms", keyCount-moveCount, moveCount, st)
 					}
 					t1 = time.Now()
 				}
@@ -138,7 +138,7 @@ func DealWithTask(keys string, token string) (string, error) {
 						cancel()
 						result = ret
 					}
-					time.Sleep(time.Microsecond * 20)
+					time.Sleep(time.Microsecond * 5)
 				}
 			}
 			//logger.Infof("协程运行完成，耗时 %d ms, 处理数据: %d", time.Since(t)/time.Millisecond, count)
