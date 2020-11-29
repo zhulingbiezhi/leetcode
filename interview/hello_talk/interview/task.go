@@ -109,9 +109,20 @@ func DealWithTask(keys string, token string) (string, error) {
 	totalCnt := 0
 	now := time.Now()
 
-	dataChan := make(chan string, ServerQPS/MaxGoroutine)
+	dataChan := make(chan string, ServerQPS)
 
 	ctx, cancel := context.WithCancel(context.Background())
+
+	ks := strings.Split(keys, ",")
+	//logger.Info("主协程开始发送数据")
+	for _, key := range ks {
+		select {
+		case dataChan <- key:
+		case <-ctx.Done():
+			break
+		}
+	}
+
 	wg := &sync.WaitGroup{}
 	wg.Add(MaxGoroutine)
 	for i := 0; i < MaxGoroutine; i++ {
@@ -128,10 +139,16 @@ func DealWithTask(keys string, token string) (string, error) {
 						break loop
 					}
 					totalCnt++
-					ret, err := executeTask(t, token)
-					if err != nil {
-						logger.Error("executeTask err", err)
-						dataChan <- t
+					var ret string
+					var err error
+					for i := 0; i < 3; i++ {
+						ret, err = executeTask(t, token)
+						if err != nil {
+							logger.Error("executeTask err", err)
+							time.Sleep(time.Microsecond * 5)
+							continue
+						}
+						break
 					}
 					if ret != "" {
 						logger.Info("协程找到匹配数据", result)
@@ -139,23 +156,14 @@ func DealWithTask(keys string, token string) (string, error) {
 						result = ret
 					}
 					time.Sleep(time.Microsecond * 5)
+				case <-ctx.Done():
+					break loop
 				}
 			}
 			//logger.Infof("协程运行完成，耗时 %d ms, 处理数据: %d", time.Since(t)/time.Millisecond, count)
 		}()
 	}
 
-	ks := strings.Split(keys, ",")
-
-	//logger.Info("主协程开始发送数据")
-	for _, key := range ks {
-		select {
-		case dataChan <- key:
-		case <-ctx.Done():
-			break
-		}
-	}
-	close(dataChan)
 	wg.Wait()
 	logger.Infof("task 处理完成，耗时: %d ms, 处理数据: %d", time.Since(now)/time.Millisecond, totalCnt)
 	return result, nil
