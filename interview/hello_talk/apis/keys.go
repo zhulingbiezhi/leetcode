@@ -20,12 +20,12 @@ func HandleGetKey(w http.ResponseWriter, r *http.Request) {
 	logger.Info("[HandleGetKey] start get key")
 
 	//todo remove test code
-	go utils.HandlePanicGo(func() {
-		interview.DistributedTasks("B1vn2x1f", "")
-	})
-	logger.Info("[HandleGetKey] get key success, response ")
-	ResponseSuccess(w, "success")
-	return
+	//go utils.HandlePanicGo(func() {
+	//	interview.DistributedTasks("B1vn2x1f", "")
+	//})
+	//logger.Info("[HandleGetKey] get key success, response ")
+	//ResponseSuccess(w, "success")
+	//return
 
 	urlStr := "http://interview.hellotalk8.com"
 	resp, err := http.DefaultClient.Get(urlStr)

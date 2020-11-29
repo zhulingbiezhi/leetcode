@@ -157,13 +157,14 @@ func DealWithTask(keys string, token string) (string, error) {
 }
 
 func executeTask(key, token string) (string, error) {
-	if key == algorithm.TestKey {
-		return algorithm.TestKey, nil
-	} else {
-		//time.Sleep(time.Millisecond)
-		//logger.Info("executeTask",key)
-		return "", nil
-	}
+	//todo remove test code
+	//if key == algorithm.TestKey {
+	//	return algorithm.TestKey, nil
+	//} else {
+	//	//time.Sleep(time.Millisecond)
+	//	//logger.Info("executeTask",key)
+	//	return "", nil
+	//}
 	urlStr := "http://interview.hellotalk8.com"
 	vals := url.Values{
 		"token": []string{token},
