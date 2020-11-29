@@ -127,6 +127,7 @@ func DealWithTask(keys string, token string) (string, error) {
 					totalCnt++
 					ret, err := executeTask(t, token)
 					if err != nil {
+						logger.Error("executeTask err",err)
 						dataChan <- t
 					}
 					if ret != "" {
